@@ -3,7 +3,10 @@ const User = require("../models/user.model");
 const Categories=require("../models/category.model")
 
 class AuthController {
-    constructor() { }
+    constructor() { 
+
+      
+    }
 
     
 
@@ -144,10 +147,73 @@ class AuthController {
   res.json(filteredUsers);
       }catch(e){
         console.log("error is--->",e)
-         return res.status(404).json({ error: 'error' });;
+         return res.status(404).json({ error: 'error' });
       }
     }
-       
+
+
+    async getUsersByCategory(req, res){
+      try {
+        const categoryRange = [
+          { min: 10, max: 500, name: "Silver" },
+          { min: 500, max: 2000, name: "Gold" },
+          { min: 2000, max: 5000, name: "Platinum" },
+          { min: 5000, max: 10000000000, name: "Jubliee" }
+        ];
+        
+        const pipeline = [
+          {
+            $addFields: {
+              category: {
+                $let: {
+                  vars: {
+                    matchedRange: {
+                      $filter: {
+                        input: categoryRange,
+                        as: "range",
+                        cond: {
+                          $and: [
+                            { $gte: ["$referralStakedBalance", "$$range.min"] },
+                            { $lt: ["$referralStakedBalance", "$$range.max"] }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  in: { $arrayElemAt: ["$$matchedRange", 0] }
+                }
+              }
+            }
+          },
+          {
+            $match: {
+              category: { $exists: true }
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              walletAddress: 1,
+              role: 1,
+              referralStakedBalance: 1,
+              categoryName: "$category.name"
+            }
+          },{
+            $sort:{
+              referralStakedBalance: 1
+            }
+          }
+        ];
+        
+        const userList = await User.aggregate(pipeline);
+        
+       return res.status(200).json({userList})
+      } catch (error) {
+        console.log("error in getUserByCategory", error);
+        return res.status(500).json("Internal Server Error")
+      }
+    }
+
     
 }
 
