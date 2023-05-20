@@ -70,7 +70,7 @@ class AuthController {
     
     async userCategory(req,res){
       const { walletAddress, balance } = req.body;
-        
+        console.log("balance is----->",balance);
         let userData = {};
         
     
@@ -87,6 +87,8 @@ class AuthController {
           const _user = await User.findOne({
             walletAddress,
           });
+
+          // console.log("user found is--->",_user);
     
           if (!_user) {
             let user = new User(userData);
@@ -102,13 +104,13 @@ class AuthController {
                 walletAddress: walletAddress
               },
               {
-                balance
+                referralStakedBalance:balance
               },{
                 new: true
               }
               
             );
-            // console.log("category result is---->",cat);
+            // console.log("user found  result is---->",user);
             return res.status(200).json({
               message: "user Balance Updated Successfully",
            

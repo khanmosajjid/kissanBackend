@@ -30,7 +30,9 @@ function errorHandler(error, request, response, next) {
 
 
 
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
