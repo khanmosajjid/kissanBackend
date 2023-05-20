@@ -5,6 +5,7 @@ const authController = new AuthController();
 router.post("/register", authController.register);
 router.post("/addUserCategory", authController.userCategory);
 router.post("/getUserCategory/:id", authController.getUserCategory);
+router.get("/getUsersByCategory", authController.getUsersByCategory)
 
 
 module.exports = router;
