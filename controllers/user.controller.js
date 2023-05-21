@@ -73,7 +73,7 @@ class AuthController {
     
     async userCategory(req,res){
       const { walletAddress, balance } = req.body;
-        console.log("balance is----->",balance);
+        // console.log("balance is----->",balance);
         let userData = {};
         
     
@@ -154,11 +154,15 @@ class AuthController {
 
     async getUsersByCategory(req, res){
       try {
+
+        let category =await Categories.find({});
+       
+        
         const categoryRange = [
-          { min: 10, max: 500, name: "Silver" },
-          { min: 500, max: 2000, name: "Gold" },
-          { min: 2000, max: 5000, name: "Platinum" },
-          { min: 5000, max: 10000000000, name: "Jubliee" }
+          { min: category[0]?.price, max: category[1]?.price, name: category[0]?.name },
+          { min: category[1]?.price, max: category[2]?.price, name: category[1]?.name },
+          { min: category[2]?.price, max: category[3]?.price, name: category[2]?.name },
+          { min: category[3]?.price, max: 10000000000000, name: category[3]?.name }
         ];
         
         const pipeline = [
