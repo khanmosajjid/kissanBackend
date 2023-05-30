@@ -6,10 +6,13 @@ bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require('cors');
 
+
+
 try {
   let db = mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    
   });
 
   console.log("Connected successfully");

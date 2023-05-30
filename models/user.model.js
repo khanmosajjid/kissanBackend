@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const userSchema = mongoose.Schema({
     walletAddress:{
         type: String,
-        require:true
+        unique:true,
+        require:true,
+       
     },
     role:{
         type: String,

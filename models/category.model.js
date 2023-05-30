@@ -6,7 +6,14 @@ const categorySchema = mongoose.Schema({
     },
     price:{
         type: Number
-    }
+    },
+    reward:{
+        type: Number
+    },
+    
+
+    
+
 },{
     timestamps: true
 });

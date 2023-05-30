@@ -4,7 +4,7 @@ class CategoryController {
   constructor() {}
 
   async addCategory(req, res) {
-    const { name, price } = req.body;
+    const { name, price,reward } = req.body;
     if (!name) {
       return res.status(400).json({ error: "Name is required" });
     }
@@ -15,6 +15,7 @@ class CategoryController {
       let _category = new Category({
         name,
         price,
+        reward
       });
       let savedCategory = await _category.save();
         return res.status(200).json({
@@ -31,18 +32,28 @@ class CategoryController {
     if (!req.params.id) {
       return res.status(400).json({ error: "Category ID is required" });
     }
+    console.log("req body is---->",req.body);
     let updatedData = {};
-    const { name, price } = req.body;
+    const { name, price,reward } = req.body;
     if (name) {
       updatedData = {
         ...updatedData,
         name,
+        
       };
     }
     if (price) {
       updatedData = {
         ...updatedData,
         price,
+        
+      };
+    }
+    if (reward) {
+      updatedData = {
+        ...updatedData,
+        reward
+        
       };
     }
     try {

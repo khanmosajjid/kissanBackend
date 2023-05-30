@@ -2,6 +2,10 @@ const validators = require("../middleware/validator");
 const User = require("../models/user.model");
 const Categories=require("../models/category.model")
 
+User.createIndexes([
+  { key: { walletAddress: 1 }, options: { unique: true } }
+]);
+
 class AuthController {
     constructor() { 
 
@@ -48,6 +52,7 @@ class AuthController {
         }
     
         try {
+          
           const _user = await User.findOne({
             walletAddress,
           });
@@ -73,20 +78,22 @@ class AuthController {
     
     async userCategory(req,res){
       const { walletAddress, balance } = req.body;
+      if (!walletAddress) {
+        return res.status(400).json({ message: "Wallet Address is required" });
+      }
         // console.log("balance is----->",balance);
-        let userData = {};
+        let userData = {
+          walletAddress:walletAddress,
+          referralStakedBalance:balance
+          
+        };
         
     
-        if (walletAddress) {
-          userData = {
-           
-            walletAddress,
-            balance
-          };
-        }
+       
         
     
         try {
+         
           const _user = await User.findOne({
             walletAddress,
           });
@@ -94,25 +101,34 @@ class AuthController {
           // console.log("user found is--->",_user);
     
           if (!_user) {
-            let user = new User(userData);
-            let savedUser = await user.save();
-            return res.status(200).json({
-              message: "User Data Successfully",
-              data: savedUser,
-            });
+            try{
+            
+              let user = new User(userData);
+              let savedUser = await user.save();
+             
+              return res.status(200).json({
+                message: "User Data Successfully",
+                data: savedUser,
+              });
+            }catch(e){
+             console.log("error in new user catch---->",e)
+            }
+           
           } else {
-
-            let user=await User.findOneAndUpdate(
-              {
-                walletAddress: walletAddress
-              },
-              {
-                referralStakedBalance:balance
-              },{
-                new: true
-              }
-              
-            );
+             if(balance>0){
+              let user=await User.findOneAndUpdate(
+                {
+                  walletAddress: walletAddress
+                },
+                {
+                  referralStakedBalance:balance
+                },{
+                  new: true
+                }
+                
+              );
+             }
+          
             // console.log("user found  result is---->",user);
             return res.status(200).json({
               message: "user Balance Updated Successfully",
@@ -156,8 +172,6 @@ class AuthController {
       try {
 
         let category =await Categories.find({});
-       
-        
         const categoryRange = [
           { min: category[0]?.price, max: category[1]?.price, name: category[0]?.name },
           { min: category[1]?.price, max: category[2]?.price, name: category[1]?.name },
@@ -210,6 +224,7 @@ class AuthController {
         ];
         
         const userList = await User.aggregate(pipeline);
+        
         
        return res.status(200).json({userList})
       } catch (error) {
